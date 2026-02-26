@@ -18,6 +18,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
+  ApiExcludeEndpoint,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -384,6 +385,7 @@ export class AuthController {
   //-----------------------------------------------(end)----------------------------------------------------------------------
 
   @ApiOperation({ summary: 'Refresh authentication token' })
+  @ApiExcludeEndpoint()
   @ApiCreatedResponse({ type: RefreshTokenResponseDto })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -407,6 +409,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Logout user and revoke refresh token' })
+  @ApiExcludeEndpoint()
   @ApiCreatedResponse({ type: BaseResponseDto })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -425,14 +428,17 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Google Login' })
+  @ApiExcludeEndpoint()
   @ApiOkResponse({ description: 'Redirects to Google for authentication' })
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleLogin(): Promise<any> {
+    // NestJS automatically handles the redirect via Passport
     return HttpStatus.OK;
   }
 
   @ApiOperation({ summary: 'Google Login Redirect' })
+  @ApiExcludeEndpoint()
   @ApiOkResponse({
     description: 'Handles Google callback and returns user data',
   })
@@ -507,6 +513,7 @@ export class AuthController {
 
   // --------- 2FA ---------
   @ApiOperation({ summary: 'Generate 2FA secret' })
+  @ApiExcludeEndpoint()
   @ApiCreatedResponse({ type: TwoFactorSecretResponseDto })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -524,6 +531,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Verify 2FA token' })
+  @ApiExcludeEndpoint()
   @ApiCreatedResponse({ type: BaseResponseDto })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -542,6 +550,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Enable 2FA' })
+  @ApiExcludeEndpoint()
   @ApiCreatedResponse({ type: BaseResponseDto })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -559,6 +568,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Disable 2FA' })
+  @ApiExcludeEndpoint()
   @ApiCreatedResponse({ type: BaseResponseDto })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)

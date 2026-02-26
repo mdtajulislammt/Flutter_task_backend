@@ -27,4 +27,3 @@ export class CreateTaskDto {
   due_date?: string;
 }
 
-export class UpdateTaskDto extends CreateTaskDto {}
