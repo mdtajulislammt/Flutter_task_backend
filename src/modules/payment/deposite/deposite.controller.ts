@@ -4,7 +4,9 @@ import { DepositeService } from './deposite.service';
 import { UpdateDepositDto } from './dto/update-deposite.dto';
 import { CreateDepositDto } from './dto/create-deposite.dto';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @UseGuards(JwtAuthGuard)
 @Controller('deposite')
 export class DepositeController {

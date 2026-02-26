@@ -1,9 +1,9 @@
 import { MailerModule } from '@nestjs-modules/mailer';
-import { Global, Module } from '@nestjs/common';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
-import { MailService } from './mail.service';
-import appConfig from '../config/app.config';
 import { BullModule } from '@nestjs/bullmq';
+import { Global, Module } from '@nestjs/common';
+import appConfig from '../config/app.config';
+import { MailService } from './mail.service';
 import { MailProcessor } from './processors/mail.processor';
 
 @Global()
@@ -15,10 +15,13 @@ import { MailProcessor } from './processors/mail.processor';
       transport: {
         host: appConfig().mail.host,
         port: +appConfig().mail.port,
-        secure: false,
+        secure: +appConfig().mail.port === 465, // auto detect
         auth: {
           user: appConfig().mail.user,
           pass: appConfig().mail.password,
+        },
+        tls: {
+          rejectUnauthorized: false, // 👈 FIX
         },
       },
       defaults: {

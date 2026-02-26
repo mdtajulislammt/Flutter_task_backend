@@ -7,14 +7,16 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { AppService } from './app.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as multer from 'multer';
-import { createReadStream } from 'fs';
-import { join } from 'path';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { Response } from 'express';
+import { createReadStream } from 'fs';
+import * as multer from 'multer';
+import { join } from 'path';
 import { Readable } from 'stream';
+import { AppService } from './app.service';
 
+@ApiExcludeController()
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}

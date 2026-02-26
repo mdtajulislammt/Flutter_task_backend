@@ -1,29 +1,26 @@
 import {
-  Controller,
-  Post,
   Body,
-  Req,
-  UseGuards,
-  Get,
-  Query,
-  UseInterceptors,
-  UploadedFile,
-  UploadedFiles,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { MessageService } from './message.service';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
+import { memoryStorage } from 'multer';
+import { PaginationDto } from 'src/common/pagination';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { MessageGateway } from './message.gateway';
-import { Request } from 'express';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage, memoryStorage } from 'multer';
-import appConfig from 'src/config/app.config';
-import { log } from 'node:console';
-import { PaginationDto } from 'src/common/pagination';
+import { MessageService } from './message.service';
 
+@ApiExcludeController()
 @ApiBearerAuth()
 @ApiTags('Message')
 @UseGuards(JwtAuthGuard)
@@ -32,8 +29,7 @@ export class MessageController {
   constructor(
     private readonly messageService: MessageService,
     private readonly messageGateway: MessageGateway,
-  ) { }
-
+  ) {}
 
   //*send message
   @Post('send-message')
@@ -41,7 +37,7 @@ export class MessageController {
     FilesInterceptor('attachments', 10, {
       storage: memoryStorage(),
       limits: {
-        fileSize: 10 * 1024 * 1024, 
+        fileSize: 10 * 1024 * 1024,
       },
     }),
   )
@@ -55,7 +51,6 @@ export class MessageController {
     return this.messageService.create(createMessageDto, user, files);
   }
 
-  
   //*get all message for a conversation
   @Get('all-message/:conversationId')
   async findAll(
@@ -64,22 +59,17 @@ export class MessageController {
     @Req() req: any,
   ) {
     const user = req.user.userId;
-   return this.messageService.findAll(conversationId, user, paginationdto);
+    return this.messageService.findAll(conversationId, user, paginationdto);
   }
- 
 
   // delete message
   @Delete('delete-message/:messageId')
-  async deleteMessage(
-    @Param('messageId') messageId: string,
-    @Req() req: any,
-  ) {
+  async deleteMessage(@Param('messageId') messageId: string, @Req() req: any) {
     const user = req.user.userId;
     return this.messageService.deleteMessage(user, messageId);
   }
-  
 
-   // unread message count
+  // unread message count
   @Get('unread-message/:conversationId')
   async getUnreadMessageCount(
     @Param('conversationId') conversationId: string,
@@ -98,6 +88,4 @@ export class MessageController {
     const user = req.user.userId;
     return this.messageService.readMessages(user, conversationId);
   }
-
- 
 }

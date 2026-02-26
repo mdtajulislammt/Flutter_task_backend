@@ -1,32 +1,61 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'; // Adjusted import path for standard Prisma setups
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
+import { UserType } from 'prisma/generated';
 
 export class CreateUserDto {
-  @IsNotEmpty()
   @ApiProperty({
-    description: 'The name of the user',
-    example: 'John Doe',
+    example: 'MD Tajul',
+    description: 'The first name of the user',
   })
-  name: string;
+  @IsString()
+  @IsNotEmpty()
+  first_name: string;
 
-  @IsNotEmpty()
   @ApiProperty({
-    description: 'The email of the user',
-    example: 'john.doe@example.com',
+    example: 'Islam',
+    description: 'The last name of the user',
   })
+  @IsString()
+  @IsNotEmpty()
+  last_name: string;
+
+  @ApiProperty({
+    example: 'dev.demo@gmail.com',
+    description: 'The unique email address of the user',
+  })
+  @IsEmail()
+  @IsNotEmpty()
   email: string;
 
-  @IsNotEmpty()
   @ApiProperty({
-    description: 'The password of the user',
-    example: 'password',
+    example: 'Earshad Nagar, Tongi, Gazipur, Bangladesh',
+    description: 'The physical address of the user',
   })
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @ApiProperty({
+    example: 'StrongPassword123',
+    description: 'The secure password for the user (minimum 8 characters)',
+  })
+  @IsString()
+  @MinLength(8, { message: 'Password should be minimum 8 characters' })
   password: string;
 
-  @IsOptional()
-  @ApiProperty({
-    description: 'The type of the user',
-    example: 'user',
+  @ApiPropertyOptional({
+    enum: UserType,
+    default: UserType.CLIENT,
+    description: 'The authorization level/role of the user',
   })
-  type?: string;
+  @IsOptional()
+  @IsEnum(UserType)
+  type?: UserType;
 }
