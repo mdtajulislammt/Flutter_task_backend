@@ -54,7 +54,6 @@ export class TasksController {
     description: 'Tasks fetched successfully.',
     type: CreateTaskDto,
   })
-  @ApiBody({ type: CreateTaskDto })
   findAll(
     @GetUser('id') userId: string,
     @Query('search') search?: string,
