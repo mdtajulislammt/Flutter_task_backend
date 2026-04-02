@@ -129,19 +129,27 @@ enum TaskStatus {
   CENCEL
 }
 
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
 model Task {
   id          String     @id @default(uuid())
   title       String
   description String?    @db.Text
   status      TaskStatus @default(TODO)
   due_date    DateTime?
-  
-  // Relation setup: user_id ekhon single source of truth
-  user        User?      @relation(fields: [user_id], references: [id])
-  user_id     String?   
 
-  created_at  DateTime   @default(now())
-  updated_at  DateTime   @updatedAt
+  // Relation setup: user_id ekhon single source of truth
+  user     User?        @relation(fields: [user_id], references: [id])
+  user_id  String?
+  priority TaskPriority @default(LOW)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("tasks")
 }

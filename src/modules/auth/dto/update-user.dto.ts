@@ -30,4 +30,11 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   })
   @IsOptional()
   address?: string;
+
+  @ApiPropertyOptional({
+    example: '123 Dhaka, Bangladesh',
+    description: 'The updated address of the user',
+  })
+  @IsOptional()
+  avatar?: string;
 }

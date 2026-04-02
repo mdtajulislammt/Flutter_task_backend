@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Prisma } from 'prisma/generated';
 import { CreateTaskDto } from 'src/modules/application/task/dto/create-task.dto';
 import { UpdateTaskDto } from 'src/modules/application/task/dto/update-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -48,46 +49,36 @@ export class TasksService {
     }
   }
 
-  async findAll(
-    userId: string,
-    query: { search?: string; page: number; limit: number },
-  ) {
-    const { search, page, limit } = query;
+  async findAll(userId: string, query: any) {
+    // 1. Defaults set kora (Page 1, Limit 10)
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const search = query.search || '';
 
-    // Pagination calculation
-    const skip = (page - 1) * limit;
-
-    // Search filter configuration
-    const where: any = {
+    // 2. Simple Where Condition
+    const where: Prisma.TaskWhereInput = {
       user_id: userId,
-      ...(search && {
-        title: {
-          contains: search,
-          mode: 'insensitive', // Case-insensitive search (PostgreSQL default)
-        },
-      }),
+      title: { contains: search, mode: 'insensitive' },
     };
 
-    // Parallel execution for better performance (High-scale SaaS strategy)
+    // 3. Parallel Query Execution
     const [tasks, total_count] = await Promise.all([
       this.prisma.task.findMany({
         where,
-        skip,
+        skip: (page - 1) * limit,
         take: limit,
         orderBy: { created_at: 'desc' },
       }),
       this.prisma.task.count({ where }),
     ]);
 
+    // 4. Return Response
     return {
       success: true,
-      statusCode: 200,
-      message: 'Tasks fetched successfully',
       data: tasks,
       meta: {
         total_items: total_count,
         current_page: page,
-        per_page: limit,
         total_pages: Math.ceil(total_count / limit),
       },
     };
@@ -122,10 +113,8 @@ export class TasksService {
       });
 
       if (!updatedTask) {
-      throw new BadRequestException(
-        'Task Not update',
-      );
-    }
+        throw new BadRequestException('Task Not update');
+      }
 
       return {
         success: true,
@@ -138,24 +127,26 @@ export class TasksService {
     }
   }
 
-async remove(id: string, userId: string) {
-  // 1. Ensure ownership before delete
-  await this.findOne(id, userId);
+  async remove(id: string, userId: string) {
+    // 1. Ensure ownership before delete
+    await this.findOne(id, userId);
 
-  try {
-    // 2. Perform Delete
-    const deleted_task = await this.prisma.task.delete({ 
-      where: { id } 
-    });
+    try {
+      // 2. Perform Delete
+      const deleted_task = await this.prisma.task.delete({
+        where: { id },
+      });
 
-    return {
-      success: true,
-      statusCode: 200,
-      message: 'Task deleted successfully',
-      data: { id: deleted_task.id },
-    };
-  } catch (error) {
-    throw new BadRequestException('Failed to delete task. It might not exist.');
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'Task deleted successfully',
+        data: { id: deleted_task.id },
+      };
+    } catch (error) {
+      throw new BadRequestException(
+        'Failed to delete task. It might not exist.',
+      );
+    }
   }
-}
 }

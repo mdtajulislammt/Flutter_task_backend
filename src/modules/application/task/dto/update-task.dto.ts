@@ -1,7 +1,12 @@
-import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { CreateTaskDto } from './create-task.dto';
-import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { TaskStatus } from 'prisma/generated';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { TaskPriority, TaskStatus } from 'prisma/generated';
 
 export class UpdateTaskDto {
   @ApiProperty({ example: 'Complete Flutter UI' })
@@ -14,13 +19,21 @@ export class UpdateTaskDto {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ 
-    enum: TaskStatus, 
+  @ApiProperty({
+    enum: TaskStatus,
     example: TaskStatus.TODO,
-    description: 'Current status of the task' 
+    description: 'Current status of the task',
   })
   @IsEnum(TaskStatus)
   status: TaskStatus;
+
+  @ApiProperty({
+    enum: TaskPriority,
+    example: TaskPriority.LOW,
+    description: 'Priority of the task',
+  })
+  @IsEnum(TaskPriority)
+  priority: TaskPriority;
 
   @ApiPropertyOptional({ example: '2026-03-05T12:00:00Z' })
   @IsDateString()

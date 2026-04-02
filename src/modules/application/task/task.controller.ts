@@ -32,7 +32,10 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new task' })
+  @ApiOperation({
+    summary: 'Create a new task (Priority: LOW,MEDIUM,HIGH,URGENT)',
+  })
+  @ApiBody({ type: CreateTaskDto, description: 'Create a new task' })
   @ApiResponse({ status: 201, description: 'Task created successfully.' })
   async create(@Req() req: any, @Body() createTaskDto: CreateTaskDto) {
     const user_id = req.user?.userId;
